@@ -1,20 +1,18 @@
 package com.TMDB.ProxyServer;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tmdb")
 @CrossOrigin(origins = "*")
 public class TmdbController {
-
-
 
     @Value("${tmdb.base.url}")
     private String baseUrl;
@@ -27,13 +25,16 @@ public class TmdbController {
         return ResponseEntity.ok("Proxy is working!");
     }
 
-    @GetMapping("/{**endpoint}")
+    @GetMapping("/**")
     public ResponseEntity<String> proxyGetRequest(
-            @PathVariable String endpoint,
+            HttpServletRequest request,
             @RequestParam(required = false) Map<String, String> allParams) {
 
         try {
-            // Alternative method using URI
+            // Extract endpoint from URL
+            String fullPath = request.getRequestURI();
+            String endpoint = fullPath.replace("/api/tmdb/", "");
+
             StringBuilder urlBuilder = new StringBuilder(baseUrl + "/" + endpoint);
 
             if (allParams != null && !allParams.isEmpty()) {
@@ -41,7 +42,6 @@ public class TmdbController {
                 allParams.forEach((key, value) ->
                         urlBuilder.append(key).append("=").append(value).append("&")
                 );
-                // Remove last '&'
                 urlBuilder.setLength(urlBuilder.length() - 1);
             }
 
