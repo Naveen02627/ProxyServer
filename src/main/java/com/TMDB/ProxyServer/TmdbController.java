@@ -15,11 +15,18 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class TmdbController {
 
+
+
     @Value("${tmdb.base.url}")
     private String baseUrl;
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("Proxy is working!");
+    }
 
     @GetMapping("/{**endpoint}")
     public ResponseEntity<String> proxyGetRequest(
